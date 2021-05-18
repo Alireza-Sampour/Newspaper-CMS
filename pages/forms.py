@@ -1,10 +1,13 @@
 # pages/forms.py
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
+from django import forms
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserCreationForm(UserCreationForm):
 
+    email = forms.EmailField(required = True, label = 'Email address')
     class Meta(UserCreationForm):
         model = User
         fields = ('username', 'email')
