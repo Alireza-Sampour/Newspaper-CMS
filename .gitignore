@@ -1,5 +1,4 @@
 .vscode
 db.sqlite3
-not_complete_test_automation.py
 __pycache__/
 *.py[cod]
