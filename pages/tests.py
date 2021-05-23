@@ -30,7 +30,6 @@ class SignupPageTests(TestCase):
     strong_password = 'QqqHJ1UNjV2cVGcq'
     weak_password = '1234'
 
-
     def test_signup_page_status_code(self):
         response = self.client.get('/signup/')
         self.assertEqual(response.status_code, 200)
@@ -50,35 +49,43 @@ class SignupPageTests(TestCase):
         self.assertEqual(User.objects.all()[0].username, self.username)
         self.assertEqual(User.objects.all()[0].email, self.correct_email)
 
-    def test_form_input_data(self):
-        # test with correct data
-        form = CustomUserCreationForm(data={'username': self.username, 'password1': self.strong_password, 'password2': self.strong_password, 'email': self.correct_email})
+    def test_form_with_correct_data(self):
+        form = CustomUserCreationForm(data={
+            'username': self.username,
+            'password1': self.strong_password,
+            'password2': self.strong_password,
+            'email': self.correct_email
+        })
         self.assertTrue(form.is_valid())
-        # test weak password data
-        form = CustomUserCreationForm(data={'username': self.username, 'password1': self.weak_password, 'password2': self.weak_password, 'email' : self.correct_email})
+    
+    def test_form_with_weak_password(self):
+        form = CustomUserCreationForm(data={
+            'username': self.username,
+            'password1': self.weak_password,
+            'password2': self.weak_password,
+            'email' : self.correct_email
+        })
         self.assertFalse(form.is_valid())
-        # test different password and password confirmation
-        form = CustomUserCreationForm(data={'username': self.username, 'password1': self.weak_password, 'password2': self.strong_password, 'email': self.correct_email})
+
+    def test_form_with_different_password(self):
+        form = CustomUserCreationForm(data={
+            'username': self.username,
+            'password1': self.weak_password,
+            'password2': self.strong_password,
+            'email': self.correct_email
+        })
         self.assertFalse(form.is_valid())
-        # test wrong email format
-        form = CustomUserCreationForm(data={'username': self.username, 'password1': self.strong_password, 'password2': self.strong_password, 'email': self.incorrect_email})
+
+    def test_form_with_wrong_email_format(self):
+        form = CustomUserCreationForm(data={
+            'username': self.username,
+            'password1': self.strong_password,
+            'password2': self.strong_password,
+            'email': self.incorrect_email
+        })
+        self.assertFalse(form.is_valid())
         self.assertFieldOutput(EmailField, {self.correct_email: self.correct_email}, {self.incorrect_email: ['Enter a valid email address.']})
 
-
-class UserModelTests(TestCase):
-    
-    username='test_user2'
-    password='QqqHJ1UNjV2cVGcq'
-    email='test_user2@test.com'
-
-    def setUp(self):
-        User.objects.create_user(self.username, self.email, self.password)
-
-    def test_max_username_length(self):
-        test_user = User.objects.get(id=1)
-        max_length = test_user._meta.get_field('username').max_length
-        self.assertEqual(max_length, 150)
-
-    def test_help_text(self):
+    def test_username_help_text(self):
         form = CustomUserCreationForm()
         self.assertEqual(form.fields['username'].help_text, 'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.')
